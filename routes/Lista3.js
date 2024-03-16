@@ -57,41 +57,29 @@ router.post('/ex3', function(req, res){
 });
 
 router.post('/ex4', function(req, res){
-    const { salarioMinimo, horasTrabalhadas, dependentes, horasExtras } = req.body;
 
-    const valorHoraTrabalhada = salarioMinimo / 5;
+    const {salarioMinimo, horasTrabalhadas, dependentes, horasExtras} = req.body
 
-    const salarioMes = horasTrabalhadas * valorHoraTrabalhada;
+    const valorHoraTrabalhada = salarioMinimo * 0.2
+    const salarioMes = valorHoraTrabalhada * horasTrabalhadas
+    const valorDependente = dependentes * 32
+    const valorHoraExtra = valorHoraTrabalhada * 1.5 * horasExtras
+    const salarioBruto = salarioMes + valorDependente + valorHoraExtra
 
-    const valorDependentes = 32 * dependentes;
-
-    const valorHoraExtra = valorHoraTrabalhada * 1.5;
-    const salarioHorasExtras = horasExtras * valorHoraExtra;
-
-    const salarioBruto = salarioMes + valorDependentes + salarioHorasExtras;
-
-    let irrf;
-    if (salarioBruto <= 2000) {
-        irrf = 0;
-    } else if (salarioBruto <= 5000) {
-        irrf = salarioBruto * 0.1;
-    } else {
-        irrf = salarioBruto * 0.2;
+    let imposto = 0
+    
+    if(salarioBruto > 2000){
+        imposto = salarioBruto >= 5000 ? 
+                               salarioBruto * 0.2 : 
+                               salarioBruto * 0.1
     }
 
-    const salarioLiquido = salarioBruto - irrf;
+    const salarioLiquido = salarioBruto - imposto
+    const gratificacao = salarioLiquido < 3500 ? 1000 : 500
+    const salarioReceber = salarioLiquido + gratificacao
 
-    let gratificacao;
-    if (salarioLiquido <= 3500) {
-        gratificacao = 1000;
-    } else {
-        gratificacao = 500;
-    }
-
-    const salarioReceber = salarioLiquido + gratificacao;
-
-    res.json({ salarioReceber });
-});
+    res.json({salarioBruto, imposto, gratificacao, salarioReceber})
+})
 
 router.post('/ex5', function(req, res){
 
